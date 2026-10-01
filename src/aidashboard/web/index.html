@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#0f1218">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="AIdashboard">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <title>AIdashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="scene"></canvas>
+
+  <button id="mute" class="chip" aria-label="Som">🔊</button>
+
+  <div id="start" class="overlay">
+    <div class="card">
+      <h1>AIdashboard</h1>
+      <p id="start-msg">Fábrica de tokens do Claude Code</p>
+      <button id="go" class="primary">Toque para iniciar</button>
+      <p class="hint">Libera os sons e mantém a tela ligada.</p>
+    </div>
+  </div>
+
+  <script src="vendor/NoSleep.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

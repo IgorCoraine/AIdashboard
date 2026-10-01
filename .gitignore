@@ -1,0 +1,14 @@
+# ambiente virtual
+.venv/
+
+# cache do Python
+__pycache__/
+*.pyc
+
+# artefatos de build/distribuição
+build/
+dist/
+*.egg-info/
+
+# config local do Claude Code (permissões pessoais)
+.claude/settings.local.json
