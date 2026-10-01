@@ -337,8 +337,8 @@
     S.beltOffset += S.beltSpeed * dt;
 
     // tubos animam até o valor real
-    S.level5 = lerp(S.level5, ((S.limits.five_hour || {}).pct || 0) / 100, Math.min(1, dt * 2));
-    S.level7 = lerp(S.level7, ((S.limits.seven_day || {}).pct || 0) / 100, Math.min(1, dt * 2));
+    S.level5 = lerp(S.level5, 1 - ((S.limits.five_hour || {}).pct || 0) / 100, Math.min(1, dt * 2));
+    S.level7 = lerp(S.level7, 1 - ((S.limits.seven_day || {}).pct || 0) / 100, Math.min(1, dt * 2));
 
     // bico solta pedras, mais rápido quando a fila cresce
     const rate = clamp(3 + S.queue.length * 0.8, 3, 30);
@@ -428,7 +428,7 @@
     c.save();
     rr(c, r.x + 3, r.y + 3, r.w - 6, r.h - 6, 9);
     c.clip();
-    const hue = levelHue(level);
+    const hue = levelHue(1 - level);
     const top = r.y + r.h - level * r.h;
     const g = c.createLinearGradient(0, top, 0, r.y + r.h);
     g.addColorStop(0, `hsl(${hue},55%,50%)`);
