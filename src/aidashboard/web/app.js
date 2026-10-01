@@ -51,6 +51,8 @@
   const HUES = [205, 28, 150, 280, 52, 330, 180, 95];
   const TOKENS_PER_PEBBLE = 400;
   const MAX_PEBBLES = 450;
+  // Chaminé: distância da borda direita da máquina, largura e altura visível acima dela.
+  const CHIMNEY = { right: 58, width: 32, height: 16 };
 
   // ---------------------------------------------------------------- estado
 
@@ -286,7 +288,7 @@
     L.info = { x: L.t7.x + L.t7.w + 20, y: top + 6 };
 
     const list = sortedSessions();
-    const mx = L.spineX + 36, mw = W - mx - 12, mTop = L.dropY + 24, gap = 12;
+    const mx = L.spineX + 36, mw = W - mx - 12, mTop = L.dropY + 24, gap = 25;
     const n = list.length;
     const mh = n ? clamp((bottom - mTop - gap * (n - 1)) / n, 58, 140) : 0;
     L.machines = [];
@@ -390,9 +392,10 @@
       a.puffT -= dt;
       if ((s.state === 'working' || s.state === 'compacting') && a.puffT <= 0) {
         a.puffT = 0.35;
-        a.puffs.push({ x: m.x + m.w - 41 + rand(-2, 2), y: m.y - 8, r: rand(3, 5), life: 1 });
+        const cx = m.x + m.w - CHIMNEY.right + CHIMNEY.width / 2;
+        a.puffs.push({ x: cx + rand(-4, 4), y: m.y - CHIMNEY.height, r: rand(7, 10), life: 1 });
       }
-      for (const p of a.puffs) { p.y -= 18 * dt; p.x += 6 * dt; p.r += 4 * dt; p.life -= dt * 0.9; }
+      for (const p of a.puffs) { p.y -= 18 * dt; p.x += 6 * dt; p.r += 7 * dt; p.life -= dt * 0.9; }
       a.puffs = a.puffs.filter(p => p.life > 0);
     }
   }
@@ -570,6 +573,19 @@
     c.restore();
   }
 
+  // Desenhada antes de todas as máquinas, para a fumaça passar por trás da máquina de cima.
+  function drawSmoke() {
+    const c = ctx;
+    for (const m of L.machines) {
+      for (const p of animFor(m.id).puffs) {
+        c.beginPath();
+        c.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        c.fillStyle = `rgba(200,210,225,${0.25 * p.life})`;
+        c.fill();
+      }
+    }
+  }
+
   function drawMachine(m, t) {
     const c = ctx, s = S.sessions.get(m.id);
     if (!s) return;
@@ -579,16 +595,9 @@
     const waiting = s.state === 'waiting';
     const pulse = waiting ? 0.5 + 0.5 * Math.sin(t * 6) : 0;
 
-    // fumaça
-    for (const p of a.puffs) {
-      c.beginPath();
-      c.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      c.fillStyle = `rgba(200,210,225,${0.25 * p.life})`;
-      c.fill();
-    }
     // chaminé
     c.fillStyle = '#2b313c';
-    c.fillRect(x + w - 46, y - 8, 10, 10);
+    c.fillRect(x + w - CHIMNEY.right, y - CHIMNEY.height, CHIMNEY.width, CHIMNEY.height + 4);
 
     // corpo
     c.save();
@@ -734,6 +743,7 @@
     c.fillRect(0, 0, W, H);
 
     drawBelts();
+    drawSmoke();
     for (const m of L.machines) drawMachine(m, t);
     drawTubes(t);
     drawPebbles();
