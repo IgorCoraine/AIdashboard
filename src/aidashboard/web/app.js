@@ -97,12 +97,12 @@
       if (!this.ctx) this.ctx = new AC();
       if (this.ctx.state === 'suspended') this.ctx.resume();
     },
-    tone(freq, t0, dur, type = 'sine', gain = 0.18) {
+    tone(freq, t0, dur, type = 'sine', gain = 0.5) {
       const c = this.ctx, o = c.createOscillator(), g = c.createGain();
       o.type = type;
       o.frequency.value = freq;
       g.gain.setValueAtTime(0.0001, t0);
-      g.gain.exponentialRampToValueAtTime(gain, t0 + 0.015);
+      g.gain.exponentialRampToValueAtTime(gain, t0 + 0.05);
       g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
       o.connect(g).connect(c.destination);
       o.start(t0);
