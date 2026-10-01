@@ -2,12 +2,17 @@
 
 Painel animado em tempo real das sessões do Claude Code, visto no celular pela rede Wi-Fi local.
 
+<p align="center">
+  <img src="claudeStatusSample.gif" width="50%" alt="Demonstração do Projeto">
+</p>
+
 - **Tubos**: limite de 5 horas e limite semanal do plano (Pro/Max). As pedras saem do tubo de 5h.
 - **Pedras na esteira**: tokens consumidos; a velocidade da esteira acompanha os tokens por minuto.
 - **Máquinas**: uma por sessão do Claude Code, mostrando o estado (trabalhando, aguardando você,
   finalizado, compactando, erro), a ferramenta em uso, o contexto ocupado, os tokens e o custo.
 - **Sons e vibração** quando uma sessão passa a aguardar você ou termina a resposta; a tela do
   celular fica ligada enquanto o painel está aberto.
+
 
 ## Como funciona
 
@@ -38,7 +43,7 @@ aidashboard                # inicia o servidor e mostra o QR code
 ```
 
 No celular (mesma rede Wi-Fi), escaneie o QR code e toque em **Toque para iniciar**. Para ver o QR
-code de novo, abra `http://127.0.0.1:47800/pair` no PC. No Windows, permita o acesso quando o
+code de novo, abra `http://127.0.0.1:47800/pair` no PC. No Windows, permita o acesso se o
 firewall perguntar (rede privada).
 
 Para ver a animação sem o Claude Code, abra `http://<ip-do-pc>:47800/?demo`.
