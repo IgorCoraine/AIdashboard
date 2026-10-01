@@ -52,7 +52,7 @@
   const TOKENS_PER_PEBBLE = 400;
   const MAX_PEBBLES = 450;
   // Chaminé: distância da borda direita da máquina, largura e altura visível acima dela.
-  const CHIMNEY = { right: 58, width: 32, height: 16 };
+  const CHIMNEY = { right: 58, width: 32, height: 9 };
 
   // ---------------------------------------------------------------- estado
 
@@ -288,7 +288,7 @@
     L.info = { x: L.t7.x + L.t7.w + 20, y: top + 6 };
 
     const list = sortedSessions();
-    const mx = L.spineX + 36, mw = W - mx - 12, mTop = L.dropY + 24, gap = 25;
+    const mx = L.spineX + 36, mw = W - mx - 12, mTop = L.dropY + 24, gap = 28;
     const n = list.length;
     const mh = n ? clamp((bottom - mTop - gap * (n - 1)) / n, 58, 140) : 0;
     L.machines = [];
@@ -577,10 +577,11 @@
   function drawSmoke() {
     const c = ctx;
     for (const m of L.machines) {
+      const a = animFor(m.id);
       for (const p of animFor(m.id).puffs) {
         c.beginPath();
         c.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        c.fillStyle = `rgba(200,210,225,${0.25 * p.life})`;
+        c.fillStyle = `hsla(${a.hue},32%,60%,${0.35 * p.life})`;
         c.fill();
       }
     }
