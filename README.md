@@ -74,3 +74,7 @@ uv venv && uv pip install -e .
 
 Variáveis úteis: `AIDASHBOARD_HOME` (padrão `~/.aidashboard`) e `CLAUDE_CONFIG_DIR`
 (padrão `~/.claude`).
+
+## Licença
+
+[MIT](LICENSE). Inclui o [NoSleep.js](https://github.com/richtr/NoSleep.js), também sob licença MIT.
