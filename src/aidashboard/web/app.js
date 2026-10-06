@@ -48,9 +48,13 @@
     error: { label: 'erro', color: '#ff5d5d' },
     idle: { label: 'pronto', color: '#8a94a6' },
   };
-  const HUES = [205, 28, 150, 280, 52, 330, 180, 95];
+  const HUES = [330, 180, 28, 280, 52, 205, 150, 95];
   const TOKENS_PER_PEBBLE = 400;
   const MAX_PEBBLES = 450;
+  // Velocidade máxima (px/s) da textura da esteira; as pedras podem andar mais rápido que isso.
+  const BELT_VISUAL_MAX = 60;
+  // Engrenagem, em rad/s (6,28 = 1 volta/s). tpmScale: tokens/min em que chega a ~63% do máximo.
+  const GEAR = { min: 0.2, max: 8, compacting: -1, tpmScale: 60000 };
   // Chaminé: distância da borda direita da máquina, largura e altura visível acima dela.
   const CHIMNEY = { right: 58, width: 32, height: 9 };
 
@@ -77,7 +81,7 @@
   function animFor(id) {
     let a = S.anim.get(id);
     if (!a) {
-      a = { hue: HUES[hueIndex++ % HUES.length], gear: 0, shake: 0, flash: 0, puffs: [], puffT: 0 };
+      a = { hue: HUES[hueIndex++ % HUES.length], gear: 0, spin: 0, tokenLog: [], shake: 0, flash: 0, puffs: [], puffT: 0 };
       S.anim.set(id, a);
     }
     return a;
@@ -174,6 +178,7 @@
       case 'tokens': {
         const w = weighted(msg);
         S.tokenLog.push([performance.now() / 1000, w]);
+        animFor(msg.session_id).tokenLog.push([performance.now() / 1000, w]);
         const n = clamp(Math.ceil(w / TOKENS_PER_PEBBLE), 1, 24);
         for (let i = 0; i < n && S.queue.length < 300; i++) S.queue.push(msg.session_id);
         break;
@@ -328,7 +333,7 @@
   function update(dt, t) {
     if (S.dirty) layout();
 
-    // tokens por minuto -> velocidade da esteira
+    // tokens por minuto -> velocidade das pedras (escoa a fila quando o consumo sobe)
     const now = performance.now() / 1000;
     while (S.tokenLog.length && now - S.tokenLog[0][0] > 60) S.tokenLog.shift();
     const tpm = S.tokenLog.reduce((sum, e) => sum + e[1], 0);
@@ -336,7 +341,8 @@
     const busy = S.pebbles.length || S.queue.length;
     const target = tpm > 0 ? 45 + 190 * (1 - Math.exp(-tpm / 40000)) : busy ? 45 : 0;
     S.beltSpeed = lerp(S.beltSpeed, target, Math.min(1, dt * 1.5));
-    S.beltOffset += S.beltSpeed * dt;
+    // a textura da esteira acompanha as pedras só até BELT_VISUAL_MAX, para não virar um borrão
+    S.beltOffset += Math.min(S.beltSpeed, BELT_VISUAL_MAX) * dt;
 
     // tubos animam até o valor real
     S.level5 = lerp(S.level5, 1 - ((S.limits.five_hour || {}).pct || 0) / 100, Math.min(1, dt * 2));
@@ -385,8 +391,13 @@
     for (const m of L.machines) {
       const s = S.sessions.get(m.id), a = animFor(m.id);
       if (!s) continue;
-      const spin = s.state === 'working' ? 3 : s.state === 'compacting' ? -6 : 0;
-      a.gear += spin * dt;
+      // engrenagem gira conforme os tokens/min da própria sessão, de GEAR.min a GEAR.max rad/s
+      while (a.tokenLog.length && now - a.tokenLog[0][0] > 60) a.tokenLog.shift();
+      const sessionTpm = a.tokenLog.reduce((sum, e) => sum + e[1], 0);
+      const rate = GEAR.min + (GEAR.max - GEAR.min) * (1 - Math.exp(-sessionTpm / GEAR.tpmScale));
+      const spin = s.state === 'working' ? rate : s.state === 'compacting' ? GEAR.compacting : 0;
+      a.spin = lerp(a.spin, spin, Math.min(1, dt * 2));
+      a.gear += a.spin * dt;
       a.shake = Math.max(0, a.shake - dt * 3);
       a.flash = Math.max(0, a.flash - dt * 4);
       a.puffT -= dt;

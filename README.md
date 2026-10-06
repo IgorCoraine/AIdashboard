@@ -7,7 +7,8 @@ Painel animado em tempo real das sessões do Claude Code, visto no celular pela 
 </p>
 
 - **Tubos**: limite de 5 horas e limite semanal do plano (Pro/Max). As pedras saem do tubo de 5h.
-- **Pedras na esteira**: tokens consumidos; a velocidade da esteira acompanha os tokens por minuto.
+- **Pedras na esteira**: tokens consumidos; a engrenagem de cada máquina gira mais rápido conforme
+  os tokens por minuto daquela sessão.
 - **Máquinas**: uma por sessão do Claude Code, mostrando o estado (trabalhando, aguardando você,
   finalizado, compactando, erro), a ferramenta em uso, o contexto ocupado, os tokens e o custo.
 - **Sons e vibração** quando uma sessão passa a aguardar você ou termina a resposta; a tela do
